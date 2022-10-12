@@ -13,6 +13,8 @@ import com.oguilhermeviana.course.repositories.UserRepository;
 import com.oguilhermeviana.course.services.exceptions.DatabaseException;
 import com.oguilhermeviana.course.services.exceptions.ResourceNotFoundException;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class UserService {
 
@@ -43,9 +45,13 @@ public class UserService {
 	}
 	
 	public User update(Long id, User obj) {
-		User entity = repository.getReferenceById(id);
-		upadateDate(entity, obj);
-		return repository.save(entity);				
+		try {
+			User entity = repository.getReferenceById(id);
+			upadateDate(entity, obj);
+			return repository.save(entity);
+		} catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException(id);
+		}
 	}
 
 	private void upadateDate(User entity, User obj) {
